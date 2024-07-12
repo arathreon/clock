@@ -2,14 +2,14 @@
 
 use std::f64::consts::PI;
 
-use druid::{
-    AppLauncher,
-    Color,
-    Data, Env, kurbo::{Circle, CircleSegment, Line}, widget::{Button, Flex, Label, Painter, SizedBox}, Widget, WindowDesc,
-};
-use druid::Lens;
 use druid::piet::{Text, TextLayout, TextLayoutBuilder};
 use druid::widget::prelude::*;
+use druid::Lens;
+use druid::{
+    kurbo::{Circle, CircleSegment, Line},
+    widget::{Button, Flex, Label, Painter, SizedBox},
+    AppLauncher, Color, Data, Env, Widget, WindowDesc,
+};
 
 const WINDOW_SIZE: f64 = 1400.;
 
