@@ -130,15 +130,17 @@ fn ui_builder() -> impl Widget<Time> {
         let circle = Circle::new(center, center.0.min(center.1));
         ctx.fill(circle, &Color::WHITE);
 
+        let orange = Color::rgb8(240, 128, 0);
+
         let colors: [Color; 12] = [
             Color::RED,
-            Color::rgb8(240, 128, 0),
+            orange,
             Color::YELLOW,
             Color::GREEN,
             Color::BLUE,
             Color::PURPLE,
             Color::RED,
-            Color::rgb8(240, 128, 0),
+            orange,
             Color::YELLOW,
             Color::GREEN,
             Color::BLUE,
