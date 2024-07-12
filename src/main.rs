@@ -4,7 +4,8 @@ use std::f64::consts::PI;
 use druid::piet::{Text, TextLayout, TextLayoutBuilder};
 use druid::widget::{prelude::*, ValueTextBox};
 use druid::Lens;
-use druid::{kurbo::{Circle, Line}, widget::{Button, Flex, Label, Painter, SizedBox}, AppLauncher, Color, Data, Env, Widget, WindowDesc};
+use druid::{kurbo::{Circle, CircleSegment, Line}, widget::{Button, Flex, Label, Painter, SizedBox}, AppLauncher, Color, Data, Env, Widget, WindowDesc};
+use druid::Value::Color;
 
 const WINDOW_SIZE: f64 = 1400.;
 
@@ -129,6 +130,10 @@ fn ui_builder() -> impl Widget<Time> {
         let center = (boundaries.width() / 2.0, boundaries.height() / 2.0);
         let circle = Circle::new(center, center.0.min(center.1));
         ctx.fill(circle, &Color::WHITE);
+
+        let circle_segment = CircleSegment::new(center, WINDOW_SIZE / 4. - WINDOW_SIZE / 40. * 2., WINDOW_SIZE / 4. - WINDOW_SIZE / 100., 0., 2.*PI/12.);
+        ctx.fill(circle_segment, &Color::RED);
+
         for n in 0..12 {
             let x = (n as f64 / 12.*2.*PI).cos();
             let y = (n as f64 / 12.*2.* PI).sin();
