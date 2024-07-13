@@ -13,7 +13,6 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-Dwarnings"
-  LINUX_GTK_INSTALL_COMMAND: sudo apt-get update && sudo apt-get install libgtk-3-dev
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,7 +32,7 @@ jobs:
           }
           - {
             os: ubuntu-latest,
-            command: ${ LINUX_GTK_INSTALL_COMMAND },
+            command: sudo apt-get update && sudo apt-get install libgtk-3-dev,
           }
           - {
             os: macos-latest,
@@ -64,7 +63,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install GTK
-        run: ${LINUX_GTK_INSTALL_COMMAND}
+        run: sudo apt-get update && sudo apt-get install libgtk-3-dev
 
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
