@@ -47,11 +47,29 @@ jobs:
         if: matrix.platform.os != 'windows-latest'
         run: ${{ matrix.platform.command }}
 
-      - name: Run clippy
-        run: cargo clippy --verbose
-
-      - name: Build
-        run: cargo build --verbose
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
 
       - name: Run tests
         run: cargo test --verbose
+
+  code_analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: Code formatting check
+        uses: actions-rust-lang/rustfmt@v1
+      - name: Code quality analysis with Clippy
+        run:
+          cargo clippy --all-targets --all-features
+      - name: Check for secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
