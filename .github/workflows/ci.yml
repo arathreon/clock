@@ -1,5 +1,9 @@
 name: CI
 
+variables:
+  - name: ubuntu_command
+    value:
+
 on:
   push:
     branches:
@@ -13,6 +17,7 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: "-Dwarnings"
+  LINUX_GTK_INSTALL_COMMAND: sudo apt-get update && sudo apt-get install libgtk-3-dev
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,7 +37,7 @@ jobs:
           }
           - {
             os: ubuntu-latest,
-            command: sudo apt-get update && sudo apt-get install libgtk-3-dev,
+            command: $LINUX_GTK_INSTALL_COMMAND,
           }
           - {
             os: macos-latest,
@@ -59,17 +64,25 @@ jobs:
     name: Code analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install GTK
+        run: $LINUX_GTK_INSTALL_COMMAND
+
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
           components: rustfmt, clippy
+
       - name: Code formatting check
         uses: actions-rust-lang/rustfmt@v1
+
       - name: Code quality analysis with Clippy
         run:
           cargo clippy --all-targets --all-features
+
       - name: Check for secrets with Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
