@@ -175,7 +175,7 @@ fn ui_builder() -> impl Widget<Time> {
             Color::PURPLE,
         ];
 
-        for n in 0..12 {
+        for (n, color) in colors.iter().enumerate() {
             let circle_segment = CircleSegment::new(
                 center,
                 WINDOW_SIZE / 4. - WINDOW_SIZE / 40. * 2.,
@@ -183,7 +183,7 @@ fn ui_builder() -> impl Widget<Time> {
                 2. * PI / 12. * n as f64,
                 2. * PI / 12.,
             );
-            ctx.fill(circle_segment, &colors[n]);
+            ctx.fill(circle_segment, color);
         }
 
         for n in 0..12 {
