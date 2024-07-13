@@ -21,19 +21,32 @@ concurrency:
 jobs:
   build_and_tests:
     name: Build and tests
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.platform.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        platform: [ ubuntu-latest, windows-latest, macos-latest ]
+        platform:
+          - {
+            os: windows-latest,
+            command: '',
+          }
+          - {
+            os: ubuntu-latest,
+            command: apt install libgtk-4-dev,
+
+          }
+          - {
+            os: macos-latest,
+            command: brew install gtk+3,
+          }
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Run clippy
-        run: cargo clippy --verbose
+        run: ${{ matrix.platform.command }} && cargo clippy --verbose
 
       - name: Build
         run: cargo build --verbose
