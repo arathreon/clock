@@ -5,9 +5,11 @@ on:
   push:
     branches:
       - "**"
+      - "1-github-actions-for-running-tests-and-building-the-app"
   pull_request:
     branches:
       - "**"
+      - "1-github-actions-for-running-tests-and-building-the-app"
 
 env:
   CARGO_TERM_COLOR: always
