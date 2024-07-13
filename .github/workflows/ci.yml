@@ -32,7 +32,7 @@ jobs:
           }
           - {
             os: ubuntu-latest,
-            command: sudo apt-get install libgtk-4-dev,
+            command: sudo apt-get install libgtk-3-dev,
 
           }
           - {
