@@ -4,7 +4,7 @@ use druid::piet::{Text, TextLayout, TextLayoutBuilder};
 use druid::widget::prelude::*;
 use druid::Lens;
 use druid::{
-    kurbo::{Circle, Line},
+    kurbo::{Circle, CircleSegment, Line},
     widget::{Button, Flex, Label, Painter, SizedBox},
     AppLauncher, Color, Data, Env, Widget, WindowDesc,
 };
@@ -157,6 +157,35 @@ fn ui_builder() -> impl Widget<Time> {
         let center = (boundaries.width() / 2.0, boundaries.height() / 2.0);
         let circle = Circle::new(center, center.0.min(center.1));
         ctx.fill(circle, &Color::WHITE);
+
+        let orange = Color::rgb8(240, 128, 0);
+
+        let colors: [Color; 12] = [
+            Color::RED,
+            orange,
+            Color::YELLOW,
+            Color::GREEN,
+            Color::BLUE,
+            Color::PURPLE,
+            Color::RED,
+            orange,
+            Color::YELLOW,
+            Color::GREEN,
+            Color::BLUE,
+            Color::PURPLE,
+        ];
+
+        for n in 0..12 {
+            let circle_segment = CircleSegment::new(
+                center,
+                WINDOW_SIZE / 4. - WINDOW_SIZE / 40. * 2.,
+                WINDOW_SIZE / 4. - WINDOW_SIZE / 100.,
+                2. * PI / 12. * n as f64,
+                2. * PI / 12.,
+            );
+            ctx.fill(circle_segment, &colors[n]);
+        }
+
         for n in 0..12 {
             let x = (n as f64 / 12. * 2. * PI).cos();
             let y = (n as f64 / 12. * 2. * PI).sin();
