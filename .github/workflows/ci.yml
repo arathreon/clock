@@ -1,10 +1,37 @@
-name: Cargo Build & Test
+name: CI
 
 on:
   push:
   pull_request:
+    branches:
+      - "**"
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  test:
+    runs-on: ${{ matrix.platform.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run clippy
+        run: cargo clippy --verbose
+
+      - name: Build
+        run: cargo build --verbose
+
+      - name: Run tests
+        run: cargo test --verbose
