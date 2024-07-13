@@ -56,6 +56,7 @@ jobs:
         run: cargo test --verbose
 
   code_analysis:
+    name: Code analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
