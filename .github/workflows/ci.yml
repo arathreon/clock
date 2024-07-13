@@ -19,8 +19,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ${{ matrix.platform.os }}
+  build_and_tests:
+    name: Build and tests
+    runs-on: ${{ matrix.platform }}
 
     strategy:
       fail-fast: false
