@@ -32,12 +32,12 @@ jobs:
           }
           - {
             os: ubuntu-latest,
-            command: sudo apt-get install libgtk-4-dev &&,
+            command: sudo apt-get install libgtk-4-dev,
 
           }
           - {
             os: macos-latest,
-            command: brew install gtk+3 &&,
+            command: brew install gtk+3,
           }
 
     steps:
