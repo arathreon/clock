@@ -29,24 +29,27 @@ jobs:
         platform:
           - {
             os: windows-latest,
-            command: '',
           }
           - {
             os: ubuntu-latest,
-            command: apt install libgtk-4-dev,
+            command: sudo apt-get install libgtk-4-dev &&,
 
           }
           - {
             os: macos-latest,
-            command: brew install gtk+3,
+            command: brew install gtk+3 &&,
           }
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install GTK
+        if: matrix.platform.os != 'windows-latest'
+        run: ${{ matrix.platform.command }}
+
       - name: Run clippy
-        run: ${{ matrix.platform.command }} && cargo clippy --verbose
+        run: cargo clippy --verbose
 
       - name: Build
         run: cargo build --verbose
