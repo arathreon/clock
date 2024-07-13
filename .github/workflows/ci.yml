@@ -1,9 +1,5 @@
 name: CI
 
-variables:
-  - name: ubuntu_command
-    value:
-
 on:
   push:
     branches:
