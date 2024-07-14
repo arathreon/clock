@@ -1,7 +1,16 @@
 [package]
 name = "clock"
+description = "A small application for children so they can learn reading analog clock."
 version = "0.1.0"
 edition = "2021"
+
+[package.metadata.bundle]
+name = "Clock"
+identifier = "com.pelc.clock"
+icon = ["images/32x32.png", "images/128x128.png", "images/128x128@2x.png"]
+copyright = "Copyright (c) Václav Pelc. All rights reserved."
+category = "Education"
+osx_url_schemes = ["com.pelc.clock"]
 
 [dependencies]
 druid = "0.8.3"

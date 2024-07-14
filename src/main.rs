@@ -1,7 +1,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use std::f64::consts::PI;
-
 use druid::piet::{Text, TextLayout, TextLayoutBuilder};
 use druid::widget::prelude::*;
 use druid::Lens;
@@ -10,6 +8,7 @@ use druid::{
     widget::{Button, Flex, Label, Painter, SizedBox},
     AppLauncher, Color, Data, Env, Widget, WindowDesc,
 };
+use std::f64::consts::PI;
 
 const WINDOW_SIZE: f64 = 1400.;
 
@@ -176,7 +175,7 @@ fn ui_builder() -> impl Widget<Time> {
             Color::PURPLE,
         ];
 
-        for n in 0..12 {
+        for (n, color) in colors.iter().enumerate() {
             let circle_segment = CircleSegment::new(
                 center,
                 WINDOW_SIZE / 4. - WINDOW_SIZE / 40. * 2.,
@@ -184,7 +183,7 @@ fn ui_builder() -> impl Widget<Time> {
                 2. * PI / 12. * n as f64,
                 2. * PI / 12.,
             );
-            ctx.fill(circle_segment, &colors[n]);
+            ctx.fill(circle_segment, color);
         }
 
         for n in 0..12 {

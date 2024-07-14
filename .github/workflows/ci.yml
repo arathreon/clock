@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - '**'
+  pull_request_target:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  RUSTFLAGS: "-Dwarnings"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code_analysis:
+    name: Code analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install GTK
+        run: sudo apt-get update && sudo apt-get install libgtk-3-dev
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Code formatting check
+        uses: actions-rust-lang/rustfmt@v1
+
+      - name: Code quality analysis with Clippy
+        run:
+          cargo clippy --all-targets --all-features
+
+      - name: Check for secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_and_tests:
+    needs: code_analysis
+    name: Build and tests
+    runs-on: ${{ matrix.platform.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - {
+            os: windows-latest,
+          }
+          - {
+            os: ubuntu-latest,
+            command: sudo apt-get update && sudo apt-get install libgtk-3-dev,
+          }
+          - {
+            os: macos-latest,
+            command: brew install gtk+3,
+          }
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install GTK
+        if: matrix.platform.os != 'windows-latest'
+        run: ${{ matrix.platform.command }}
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Run tests
+        run: cargo test --verbose
