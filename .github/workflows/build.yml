@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - 1-github-actions-for-running-tests-and-building-the-app
+      - main
 
 env:
   CARGO_TERM_COLOR: always
