@@ -40,7 +40,7 @@ jobs:
             command: brew install gtk+3,
             build_command: cargo bundle --release,
             artifact_name: "clock-macos",
-            artifact_path: "bundle/osx/Clock.app"
+            artifact_path: "bundle/osx"
           }
 
     steps:
