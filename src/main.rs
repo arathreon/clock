@@ -303,8 +303,9 @@ fn ui_builder() -> impl Widget<Time> {
 }
 
 fn main() {
-    let main_window =
-        WindowDesc::new(ui_builder()).window_size((WINDOW_SIZE * 0.6, WINDOW_SIZE * 0.6));
+    let main_window = WindowDesc::new(ui_builder())
+        .window_size((WINDOW_SIZE * 0.6, WINDOW_SIZE * 0.6))
+        .title("Clock");
     AppLauncher::with_window(main_window)
         .log_to_console()
         .launch(Time {
