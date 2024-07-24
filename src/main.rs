@@ -75,29 +75,29 @@ struct MinutesFormatter;
 
 impl Formatter<u8> for HoursFormatter {
     fn format(&self, value: &u8) -> String {
-        format(&value)
+        format(value)
     }
 
     fn validate_partial_input(&self, input: &str, _sel: &Selection) -> Validation {
-        validate_partial_input(&input, 24)
+        validate_partial_input(input, 24)
     }
 
     fn value(&self, input: &str) -> Result<u8, ValidationError> {
-        value(&input)
+        value(input)
     }
 }
 
 impl Formatter<u8> for MinutesFormatter {
     fn format(&self, value: &u8) -> String {
-        format(&value)
+        format(value)
     }
 
     fn validate_partial_input(&self, input: &str, _sel: &Selection) -> Validation {
-        validate_partial_input(&input, 60)
+        validate_partial_input(input, 60)
     }
 
     fn value(&self, input: &str) -> Result<u8, ValidationError> {
-        value(&input)
+        value(input)
     }
 }
 
