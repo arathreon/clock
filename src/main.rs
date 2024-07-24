@@ -5,7 +5,7 @@ use druid::widget::{prelude::*, TextBox, ValueTextBox};
 use druid::{
     kurbo::{Circle, CircleSegment, Line},
     text::{Formatter, Selection, Validation, ValidationError},
-    widget::{Button, Flex, Label, Painter, SizedBox},
+    widget::{Button, Flex, Painter, SizedBox},
     AppLauncher, Color, Data, Env, Widget, WindowDesc,
 };
 use druid::{Lens, WidgetExt};
@@ -220,15 +220,12 @@ fn decrease_minutes_decreases_minutes_and_hours() {
 }
 
 fn ui_builder() -> impl Widget<Time> {
-    // Counter: _
-    // + -
-    // let label_hours = Label::new(|data: &Time, _: &Env| data.hours.to_string());
-
+    // Text fields with hours and minutes
     let valuetextbox_hours = ValueTextBox::new(TextBox::new(), HoursFormatter).lens(Time::hours);
     let valuetextbox_minutes =
         ValueTextBox::new(TextBox::new(), MinutesFormatter).lens(Time::minutes);
 
-    // let label_minutes = Label::new(|data: &Time, _: &Env| data.minutes.to_string());
+    // Buttons for increasing and decreasing hours and minutes
     let increment_hours =
         Button::new("+").on_click(|_ctx, data: &mut Time, _env| increase_hours(data));
     let decrement_hours =
@@ -343,7 +340,7 @@ fn ui_builder() -> impl Widget<Time> {
 
         ctx.stroke(
             Line::new(
-                ((WINDOW_SIZE / 4.), (WINDOW_SIZE / 4.)),
+                (WINDOW_SIZE / 4., WINDOW_SIZE / 4.),
                 (
                     minutes_x * (WINDOW_SIZE / 40. * 6.5) + (WINDOW_SIZE / 4.),
                     minutes_y * (WINDOW_SIZE / 40. * 6.5) + (WINDOW_SIZE / 4.),
@@ -354,7 +351,7 @@ fn ui_builder() -> impl Widget<Time> {
         );
         ctx.stroke(
             Line::new(
-                ((WINDOW_SIZE / 4.), (WINDOW_SIZE / 4.)),
+                (WINDOW_SIZE / 4., WINDOW_SIZE / 4.),
                 (
                     hours_x * (WINDOW_SIZE / 40. * 3.25) + (WINDOW_SIZE / 4.),
                     hours_y * (WINDOW_SIZE / 40. * 3.25) + (WINDOW_SIZE / 4.),
@@ -365,6 +362,7 @@ fn ui_builder() -> impl Widget<Time> {
         );
     });
 
+    // Creating a layout using the graphics described above
     Flex::column()
         .with_child(
             SizedBox::new(clock)
