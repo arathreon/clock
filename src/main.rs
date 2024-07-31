@@ -1,14 +1,18 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use druid::piet::{Text, TextLayout, TextLayoutBuilder};
-use druid::widget::prelude::*;
-use druid::Lens;
+use druid::widget::{prelude::*, TextBox, ValueTextBox};
 use druid::{
     kurbo::{Circle, CircleSegment, Line},
-    widget::{Button, Flex, Label, Painter, SizedBox},
+    text::{Formatter, Selection, Validation, ValidationError},
+    widget::{Button, Flex, Painter, SizedBox},
     AppLauncher, Color, Data, Env, Widget, WindowDesc,
 };
+use druid::{Lens, WidgetExt};
+
 use std::f64::consts::PI;
+use std::fmt;
+use std::str::FromStr;
 
 const WINDOW_SIZE: f64 = 1400.;
 
@@ -16,6 +20,85 @@ const WINDOW_SIZE: f64 = 1400.;
 struct Time {
     hours: u8,
     minutes: u8,
+}
+
+#[derive(Debug, Clone)]
+struct InputValidationError {
+    message: String,
+}
+
+impl InputValidationError {
+    fn new(message: &str) -> Self {
+        InputValidationError {
+            message: message.to_string(),
+        }
+    }
+}
+
+impl fmt::Display for InputValidationError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl std::error::Error for InputValidationError {}
+
+fn format(value: &u8) -> String {
+    value.to_string()
+}
+
+fn validate_partial_input(input: &str, upper_limit: u8) -> Validation {
+    if input.is_empty() {
+        return Validation::success();
+    }
+    match u8::from_str(input) {
+        Ok(num) if num <= upper_limit => Validation::success(),
+        _ => Validation::failure(InputValidationError::new(
+            "Input must be a number between 0 and 24.",
+        )),
+    }
+}
+
+fn value(input: &str) -> Result<u8, ValidationError> {
+    if input.is_empty() {
+        return Ok(0);
+    }
+    input.parse::<u8>().map_err(|_| {
+        ValidationError::new(InputValidationError::new(
+            "Input must be a number between 0 and 24.",
+        ))
+    })
+}
+
+struct HoursFormatter;
+struct MinutesFormatter;
+
+impl Formatter<u8> for HoursFormatter {
+    fn format(&self, value: &u8) -> String {
+        format(value)
+    }
+
+    fn validate_partial_input(&self, input: &str, _sel: &Selection) -> Validation {
+        validate_partial_input(input, 24)
+    }
+
+    fn value(&self, input: &str) -> Result<u8, ValidationError> {
+        value(input)
+    }
+}
+
+impl Formatter<u8> for MinutesFormatter {
+    fn format(&self, value: &u8) -> String {
+        format(value)
+    }
+
+    fn validate_partial_input(&self, input: &str, _sel: &Selection) -> Validation {
+        validate_partial_input(input, 60)
+    }
+
+    fn value(&self, input: &str) -> Result<u8, ValidationError> {
+        value(input)
+    }
 }
 
 fn decrease_hours(data: &mut Time) {
@@ -137,12 +220,12 @@ fn decrease_minutes_decreases_minutes_and_hours() {
 }
 
 fn ui_builder() -> impl Widget<Time> {
-    // Counter: _
-    // + -
-    let label_hours = Label::new(|data: &Time, _: &Env| data.hours.to_string());
-    // let valuetextbox_hours = ValueTextBox::new(TextBox::new().lens(Time::hours),);
+    // Text fields with hours and minutes
+    let valuetextbox_hours = ValueTextBox::new(TextBox::new(), HoursFormatter).lens(Time::hours);
+    let valuetextbox_minutes =
+        ValueTextBox::new(TextBox::new(), MinutesFormatter).lens(Time::minutes);
 
-    let label_minutes = Label::new(|data: &Time, _: &Env| data.minutes.to_string());
+    // Buttons for increasing and decreasing hours and minutes
     let increment_hours =
         Button::new("+").on_click(|_ctx, data: &mut Time, _env| increase_hours(data));
     let decrement_hours =
@@ -152,6 +235,7 @@ fn ui_builder() -> impl Widget<Time> {
     let decrement_minutes =
         Button::new("-").on_click(|_ctx, data: &mut Time, _env| decrease_minutes(data));
 
+    // Clock graphics
     let clock = Painter::new(|ctx: &mut PaintCtx, data: &Time, _: &Env| {
         let boundaries = ctx.size().to_rect();
         let center = (boundaries.width() / 2.0, boundaries.height() / 2.0);
@@ -256,7 +340,7 @@ fn ui_builder() -> impl Widget<Time> {
 
         ctx.stroke(
             Line::new(
-                ((WINDOW_SIZE / 4.), (WINDOW_SIZE / 4.)),
+                (WINDOW_SIZE / 4., WINDOW_SIZE / 4.),
                 (
                     minutes_x * (WINDOW_SIZE / 40. * 6.5) + (WINDOW_SIZE / 4.),
                     minutes_y * (WINDOW_SIZE / 40. * 6.5) + (WINDOW_SIZE / 4.),
@@ -267,7 +351,7 @@ fn ui_builder() -> impl Widget<Time> {
         );
         ctx.stroke(
             Line::new(
-                ((WINDOW_SIZE / 4.), (WINDOW_SIZE / 4.)),
+                (WINDOW_SIZE / 4., WINDOW_SIZE / 4.),
                 (
                     hours_x * (WINDOW_SIZE / 40. * 3.25) + (WINDOW_SIZE / 4.),
                     hours_y * (WINDOW_SIZE / 40. * 3.25) + (WINDOW_SIZE / 4.),
@@ -278,6 +362,7 @@ fn ui_builder() -> impl Widget<Time> {
         );
     });
 
+    // Creating a layout using the graphics described above
     Flex::column()
         .with_child(
             SizedBox::new(clock)
@@ -290,21 +375,22 @@ fn ui_builder() -> impl Widget<Time> {
                 .with_child(
                     Flex::column()
                         .with_child(increment_hours)
-                        .with_child(label_hours)
+                        .with_child(valuetextbox_hours)
                         .with_child(decrement_hours),
                 )
                 .with_child(
                     Flex::column()
                         .with_child(increment_minutes)
-                        .with_child(label_minutes)
+                        .with_child(valuetextbox_minutes)
                         .with_child(decrement_minutes),
                 ),
         )
 }
 
 fn main() {
-    let main_window =
-        WindowDesc::new(ui_builder()).window_size((WINDOW_SIZE * 0.6, WINDOW_SIZE * 0.6));
+    let main_window = WindowDesc::new(ui_builder())
+        .window_size((WINDOW_SIZE * 0.6, WINDOW_SIZE * 0.6))
+        .title("Clock");
     AppLauncher::with_window(main_window)
         .log_to_console()
         .launch(Time {
